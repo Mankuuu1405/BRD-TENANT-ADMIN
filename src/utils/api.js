@@ -157,7 +157,19 @@ const listLogs = async (params = {}) => {
   return { ok: true, data: res.data }
 }
 
-export const logsApi = { list: listLogs }
+const createLog = async (body) => {
+  if (!base) {
+    const id = `LG${Math.random().toString(36).slice(2,6)}`
+    const item = { log_id: id, timestamp: new Date().toISOString(), tenant_id: body.tenant_id || null, event_type: body.event_type, actor_user_id: body.actor_user_id || 'u-101', actor_user_role: body.actor_user_role || 'Admin', target_entity: body.target_entity || 'Loan', target_entity_id: body.target_entity_id || '', summary: body.summary || '', details: body.details || {} }
+    mockLogs.unshift(item)
+    return { ok: true, data: item }
+  }
+  const res = await withBackoff(() => axios.post(`${base}/api/v1/logs/audit`, body))
+  if (!res) return { ok: false }
+  return { ok: true }
+}
+
+export const logsApi = { list: listLogs, create: createLog }
 
 const jobs = new Map()
 
@@ -358,7 +370,8 @@ const getProfile = async () => {
   const u = mockUsers.find(x => x.user_id === mockCurrentUserId)
   if (!u) return { ok: false }
   const role = mockRoles.find(r => r.role_id===u.role_id)
-  return { ok: true, data: { user_id: u.user_id, full_name: u.name, email: u.email, phone_number: u.phone_number, role_name: role?.role_name || u.role_name, tenant_id: u.tenant_id } }
+  const avatar = (()=>{ try { return localStorage.getItem('profile_avatar') || null } catch { return null } })()
+  return { ok: true, data: { user_id: u.user_id, full_name: u.name, email: u.email, phone_number: u.phone_number, role_name: role?.role_name || u.role_name, tenant_id: u.tenant_id, avatar_url: avatar } }
 }
 
 const updateProfile = async ({ full_name, phone_number }) => {
@@ -374,7 +387,16 @@ const changePassword = async ({ current_password, new_password }) => {
   return { ok: true }
 }
 
-export const profileApi = { get: getProfile, update: updateProfile, changePassword }
+const uploadAvatar = async (data_url) => {
+  try {
+    localStorage.setItem('profile_avatar', data_url)
+    return { ok: true }
+  } catch {
+    return { ok: false }
+  }
+}
+
+export const profileApi = { get: getProfile, update: updateProfile, changePassword, uploadAvatar }
 
 const listNotifications = async () => {
   const data = [...mockNotifications].sort((a,b)=> new Date(b.created_at) - new Date(a.created_at))
