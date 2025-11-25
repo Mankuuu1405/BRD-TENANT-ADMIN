@@ -20,6 +20,7 @@ export default function Loans() {
     { loan_id: 'DL004', tenant_id: 'tenant-003', applicant_name: 'Vikram Singh', amount: 650000, term_months: 36, applied_on: new Date().toISOString(), status: 'Disbursed' }
   ]
   const [items, setItems] = useState(demoLoans)
+  const [allItems, setAllItems] = useState(demoLoans)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [statusFilter, setStatusFilter] = useState('All')
@@ -30,14 +31,17 @@ export default function Loans() {
   const [rejectReason, setRejectReason] = useState('')
 
   const counts = useMemo(() => {
-    const c = { All: items.length, Pending: 0, Approved: 0, Rejected: 0 }
-    items.forEach(i => { if (c[i.status] !== undefined) c[i.status]++ })
+    const c = { All: allItems.length, Pending: 0, Approved: 0, Rejected: 0 }
+    allItems.forEach(i => { if (c[i.status] !== undefined) c[i.status]++ })
     return c
-  }, [items])
+  }, [allItems])
 
   const load = async () => {
     setLoading(true)
     setError(null)
+    const resAll = await loansApi.list({ search })
+    if (resAll.ok) setAllItems(resAll.data && resAll.data.length ? resAll.data : demoLoans)
+    else setAllItems(demoLoans)
     const res = await loansApi.list({ status_filter: statusFilter !== 'All' ? statusFilter : undefined, search })
     setLoading(false)
     if (res.ok) setItems(res.data && res.data.length ? res.data : demoLoans)
