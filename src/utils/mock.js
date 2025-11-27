@@ -100,7 +100,25 @@ export const mockTenants = [
 export const mockRoles = [
   { role_id: 'role-super', role_name: 'Super Admin', description: 'Platform owner role', is_system_role: true },
   { role_id: 'role-credit', role_name: 'Credit Manager', description: 'Manages loan approvals', is_system_role: false },
-  { role_id: 'role-analyst', role_name: 'Analyst', description: 'Views data and prepares reports', is_system_role: false }
+  { role_id: 'role-analyst', role_name: 'Analyst', description: 'Views data and prepares reports', is_system_role: false },
+  { role_id: 'role-sales', role_name: 'Sales', description: 'Internal', is_system_role: false },
+  { role_id: 'role-operational', role_name: 'Operational', description: 'Internal', is_system_role: false },
+  { role_id: 'role-credit2', role_name: 'Credit', description: 'Internal', is_system_role: false },
+  { role_id: 'role-risk', role_name: 'Risk', description: 'Internal', is_system_role: false },
+  { role_id: 'role-verification', role_name: 'Verification', description: 'Internal', is_system_role: false },
+  { role_id: 'role-investigation', role_name: 'Investigation', description: 'Internal', is_system_role: false },
+  { role_id: 'role-valuation', role_name: 'Valuation', description: 'Internal', is_system_role: false },
+  { role_id: 'role-fraud', role_name: 'Fraud', description: 'Internal', is_system_role: false },
+  { role_id: 'role-finance', role_name: 'Finance', description: 'Internal', is_system_role: false },
+  { role_id: 'role-accounting', role_name: 'Accounting', description: 'Internal', is_system_role: false },
+  { role_id: 'role-collection', role_name: 'Collection', description: 'Internal', is_system_role: false },
+  { role_id: 'role-legal', role_name: 'Legal', description: 'Internal', is_system_role: false },
+  { role_id: 'role-compliance', role_name: 'Compliance', description: 'Internal', is_system_role: false },
+  { role_id: 'role-recovery-agency', role_name: 'Recovery Agency', description: 'External', is_system_role: false },
+  { role_id: 'role-external-legal', role_name: 'Legal Team', description: 'External', is_system_role: false },
+  { role_id: 'role-external-investigation', role_name: 'Investigation Team', description: 'External', is_system_role: false },
+  { role_id: 'role-external-valuation', role_name: 'Valuation Team', description: 'External', is_system_role: false },
+  { role_id: 'role-docs-search', role_name: 'Documents Search Team', description: 'External', is_system_role: false }
 ]
 
 export const mockPermissions = [

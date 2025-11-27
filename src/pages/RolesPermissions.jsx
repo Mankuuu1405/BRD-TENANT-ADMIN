@@ -10,12 +10,12 @@ export default function RolesPermissions() {
   const [matrix, setMatrix] = useState([])
   const [matrixLoading, setMatrixLoading] = useState(false)
   const [matrixError, setMatrixError] = useState(null)
-  const [confirmDelete, setConfirmDelete] = useState(null)
+  
 
   const load = async () => {
     setError(null)
     const res = await rolesApi.list()
-    if (res.ok) setRoles(res.data)
+    if (res.ok) setRoles((res.data || []).filter(r => r.role_name !== 'Super Admin'))
     else setError('Unable to load roles')
   }
 
@@ -70,7 +70,6 @@ export default function RolesPermissions() {
                 <td className="px-4 py-3">{r.is_system_role ? 'Yes' : 'No'}</td>
                 <td className="px-4 py-3 flex gap-2">
                   <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={()=>openMatrix(r)}>Manage Permissions</button>
-                  <button className="h-8 px-3 rounded-lg border border-red-200 text-red-700 disabled:opacity-50" disabled={r.is_system_role} onClick={()=>setConfirmDelete(r)}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -103,21 +102,7 @@ export default function RolesPermissions() {
         </div>
       )}
 
-      {confirmDelete && (
-        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40">
-          <div className="bg-white w-full max-w-md rounded-xl border border-gray-200 shadow-card p-4">
-            <div className="text-lg font-semibold">Delete Role</div>
-            <div className="mt-2 text-sm text-gray-700">Are you sure you want to delete the role "{confirmDelete.role_name}"?</div>
-            <div className="mt-3 flex justify-end gap-2">
-              <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>setConfirmDelete(null)}>Cancel</button>
-              <button className="h-9 px-3 rounded-lg bg-red-600 text-white" onClick={async ()=>{
-                const res = await rolesApi.delete(confirmDelete.role_id)
-                if (res.ok) { setConfirmDelete(null); load() }
-              }}>Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {matrixRole && (
         <div className="fixed inset-0 bg-black/25 grid place-items-center z-40">
