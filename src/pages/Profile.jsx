@@ -8,6 +8,7 @@ export default function Profile() {
   const [pwd, setPwd] = useState({ current_password: '', new_password: '' })
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const [avatar, setAvatar] = useState(null)
 
   const load = async () => {
     setError(null)
@@ -16,6 +17,7 @@ export default function Profile() {
       setData(res.data)
       setName(res.data.full_name)
       setPhone(res.data.phone_number || '')
+      setAvatar(res.data.avatar_url || null)
     } else setError('Unable to load profile')
   }
 
@@ -36,6 +38,21 @@ export default function Profile() {
     if (!pwd.current_password || !pwd.new_password) { setError('Enter current and new password'); return }
     const r = await profileApi.changePassword(pwd)
     if (r.ok) { setSuccess('Password changed'); setPwd({ current_password: '', new_password: '' }) } else setError('Password change failed')
+  }
+
+  const onAvatarChange = async (file) => {
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const dataUrl = String(reader.result || '')
+      setAvatar(dataUrl)
+      const r = await profileApi.uploadAvatar(dataUrl)
+      if (r.ok) {
+        setSuccess('Profile photo updated')
+        window.dispatchEvent(new CustomEvent('profile-avatar-updated'))
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   
@@ -62,6 +79,20 @@ export default function Profile() {
         <div className="bg-white rounded-xl shadow-card p-4 border border-gray-100">
           <div className="text-sm font-medium mb-2">Account Details</div>
           <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="h-16 w-16 rounded-full border border-gray-200 overflow-hidden bg-gray-100 grid place-items-center">
+                {avatar ? (<img src={avatar} alt="avatar" className="h-full w-full object-cover" />) : (<span className="text-gray-500">TA</span>)}
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="h-9 px-3 rounded-lg border border-gray-200 bg-white text-gray-700 cursor-pointer">
+                  <input type="file" accept="image/*" className="hidden" onChange={(e)=>onAvatarChange(e.target.files?.[0] || null)} />
+                  Upload Image
+                </label>
+                {avatar && (
+                  <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={async ()=>{ setAvatar(null); await profileApi.uploadAvatar(''); window.dispatchEvent(new CustomEvent('profile-avatar-updated')) }}>Remove</button>
+                )}
+              </div>
+            </div>
             <label className="block">
               <div className="text-sm text-gray-700">Full Name</div>
               <input value={name} onChange={(e)=>setName(e.target.value)} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3" />
