@@ -16,6 +16,8 @@ import Signup from './pages/Signup.jsx'
 import Login from './pages/Login.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import InternalTeamManagement from './pages/InternalTeamManagement.jsx'
+import Rules from './pages/Rules.jsx'
+import Categories from './pages/Categories.jsx'
 import { dashboardApi } from './utils/api.js'
 
 export default function App() {
@@ -46,7 +48,7 @@ export default function App() {
         </>
       )}
       <main className={page === 'login' || page === 'signup' || page === 'forgot_password' ? '' : 'pl-64 pt-16'}>
-        {page === 'branches' ? <Branches /> : page === 'loans' ? <Loans /> : page === 'logs' ? <Logs /> : page === 'calendar' ? <Calendar /> : page === 'roles_permissions' ? <RolesPermissions /> : page === 'tenants' ? <Tenants /> : page === 'users' ? <Users /> : page === 'settings' ? <Settings /> : page === 'profile' ? <Profile /> : page === 'notifications' ? <Notifications /> : page === 'internal_team_management' ? <InternalTeamManagement /> : page === 'forgot_password' ? <ForgotPassword /> : page === 'signup' ? <Signup /> : page === 'login' ? <Login /> : <Dashboard />}
+        {page === 'branches' ? <Branches /> : page === 'loans' ? <Loans /> : page === 'logs' ? <Logs /> : page === 'calendar' ? <Calendar /> : page === 'roles_permissions' ? <RolesPermissions /> : page === 'tenants' ? <Tenants /> : page === 'users' ? <Users /> : page === 'settings' ? <Settings /> : page === 'profile' ? <Profile /> : page === 'notifications' ? <Notifications /> : page === 'internal_team_management' ? <InternalTeamManagement /> : page === 'rules' ? <Rules /> : page === 'categories' ? <Categories /> : page === 'forgot_password' ? <ForgotPassword /> : page === 'signup' ? <Signup /> : page === 'login' ? <Login /> : <Dashboard />}
       </main>
     </div>
   )
