@@ -1,13 +1,13 @@
-import { HomeIcon, UsersIcon, CalendarDaysIcon, DocumentTextIcon, CubeIcon, ShieldCheckIcon, ServerStackIcon, Cog6ToothIcon, ArrowLeftOnRectangleIcon, LinkIcon, BanknotesIcon, UserCircleIcon, CreditCardIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, UsersIcon, CalendarDaysIcon, DocumentTextIcon, CubeIcon, ShieldCheckIcon, ServerStackIcon, Cog6ToothIcon, ArrowLeftOnRectangleIcon, LinkIcon, BanknotesIcon, UserCircleIcon, CreditCardIcon, KeyIcon } from '@heroicons/react/24/outline'
 
 const items = [
   { key: 'dashboard', label: 'Dashboard', icon: HomeIcon },
   { key: 'branches', label: 'Branches', icon: ServerStackIcon },
-  { key: 'loans', label: 'Loans', icon: ShieldCheckIcon },
-  { key: 'users', label: 'Users', icon: UsersIcon },
+  { key: 'loans', label: 'Loans', icon: BanknotesIcon },
+  { key: 'users', label: 'Users', icon: UserCircleIcon },
   { key: 'calendar', label: 'Calendar', icon: CalendarDaysIcon },
   { key: 'tenants', label: 'Product Loan', icon: CubeIcon },
-  { key: 'roles_permissions', label: 'Roles & Permissions', icon: ShieldCheckIcon },
+  { key: 'roles_permissions', label: 'Roles & Permissions', icon: KeyIcon },
   { key: 'settings', label: 'System Settings', icon: Cog6ToothIcon }
 ]
 
@@ -44,6 +44,14 @@ export default function Sidebar({ activeKey, onNavigate }) {
         }} className="w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg text-gray-700 hover:bg-gray-50">
           <CreditCardIcon className="h-5 w-5" />
           <span>Subscription & Plan</span>
+        </button>
+        <button onClick={() => onNavigate && onNavigate('rules')} className={`w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg ${activeKey==='rules' ? 'text-primary-700 bg-primary-50' : 'text-gray-700 hover:bg-gray-50'}`}>
+          <DocumentTextIcon className="h-5 w-5" />
+          <span className="whitespace-nowrap">Rules</span>
+        </button>
+        <button onClick={() => onNavigate && onNavigate('categories')} className={`w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg ${activeKey==='categories' ? 'text-primary-700 bg-primary-50' : 'text-gray-700 hover:bg-gray-50'}`}>
+          <LinkIcon className="h-5 w-5" />
+          <span className="whitespace-nowrap">Type of category</span>
         </button>
       </nav>
       <div className="p-2 border-t border-gray-100">
