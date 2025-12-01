@@ -46,7 +46,7 @@ export default function Logs() {
         <div className="flex flex-col">
           <div className="text-xl font-semibold">Manage Logs</div>
         </div>
-        <button className="h-9 px-3 rounded-lg bg-primary-600 text-white" onClick={()=>{ setCreating(true); setForm({ summary: '', actor_user_role: '', status: 'Approved' }) }}>+ New Log</button>
+        
       </div>
 
       {error && <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg p-3">{error}</div>}
@@ -58,6 +58,7 @@ export default function Logs() {
         <div className="ml-auto flex items-center gap-2">
           <input value={search} onChange={(e)=>setSearch(e.target.value)} onKeyDown={(e)=>{ if (e.key==='Enter') load() }} placeholder="Search summary or event type" className="h-9 w-72 rounded-lg border border-gray-300 px-3" />
           <button onClick={load} className="h-9 px-3 rounded-lg border border-gray-200">Search</button>
+          <button onClick={()=>{ setCreating(true); setForm({ summary: '', actor_user_role: '', status: 'Approved' }) }} className="h-9 px-3 rounded-lg bg-primary-600 text-white">New Log</button>
         </div>
       </div>
 

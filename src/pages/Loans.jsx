@@ -28,8 +28,15 @@ const LOAN_TYPES = [
 ]
 
 export default function Loans() {
-  const [tenants, setTenants] = useState([])
-  const [items, setItems] = useState([])
+  const demoLoans = [
+    { loan_id: 'DL001', tenant_id: 'tenant-001', applicant_name: 'Amit Sharma', amount: 500000, term_months: 12, applied_on: new Date().toISOString(), status: 'Pending' },
+    { loan_id: 'DL002', tenant_id: 'tenant-001', applicant_name: 'Neha Verma', amount: 750000, term_months: 18, applied_on: new Date().toISOString(), status: 'Approved' },
+    { loan_id: 'DL003', tenant_id: 'tenant-002', applicant_name: 'Rahul Mehta', amount: 300000, term_months: 24, applied_on: new Date().toISOString(), status: 'Rejected' },
+    { loan_id: 'DL004', tenant_id: 'tenant-003', applicant_name: 'Vikram Singh', amount: 650000, term_months: 36, applied_on: new Date().toISOString(), status: 'Disbursed' }
+  ]
+  const [items, setItems] = useState(demoLoans)
+  const [allItems, setAllItems] = useState(demoLoans)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [creating, setCreating] = useState(false)
   const [viewing, setViewing] = useState(null)
@@ -58,22 +65,27 @@ export default function Loans() {
   useEffect(() => { loadTenants() }, [])
 
   const counts = useMemo(() => {
-    const c = { Active: 0, Inactive: 0 }
-    items.forEach(i => { if (c[i.status] !== undefined) c[i.status]++ })
+    const c = { All: allItems.length, Pending: 0, Approved: 0, Rejected: 0 }
+    allItems.forEach(i => { if (c[i.status] !== undefined) c[i.status]++ })
     return c
-  }, [items])
+  }, [allItems])
 
-  const filteredItems = useMemo(() => items.filter(b => {
-    if (statusFilter !== 'All' && b.status !== statusFilter) return false
-    const s = search.trim().toLowerCase()
-    if (!s) return true
-    return (
-      (b.business_name||'').toLowerCase().includes(s) ||
-      (b.type_of_loan||'').toLowerCase().includes(s) ||
-      (b.subcategory||'').toLowerCase().includes(s) ||
-      (b.status||'').toLowerCase().includes(s)
-    )
-  }), [items, search, statusFilter])
+  const load = async () => {
+    setLoading(true)
+    setError(null)
+    const resAll = await loansApi.list({ search })
+    if (resAll.ok) setAllItems(resAll.data && resAll.data.length ? resAll.data : demoLoans)
+    else setAllItems(demoLoans)
+    const res = await loansApi.list({ status_filter: statusFilter !== 'All' ? statusFilter : undefined, search })
+    setLoading(false)
+    if (res.ok) setItems(res.data && res.data.length ? res.data : demoLoans)
+    else {
+      setItems(demoLoans)
+      setError('Unable to load loans')
+    }
+  }
+
+  useEffect(() => { load() }, [statusFilter])
 
   return (
     <div className="p-4 space-y-4">
