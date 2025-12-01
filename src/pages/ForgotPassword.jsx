@@ -33,7 +33,7 @@ export default function ForgotPassword() {
         </label>
 
         <div className="mt-6">
-          <button className="h-11 w-full rounded-xl bg-primary-600 hover:bg-primary-700 transition text-white" onClick={submit}>Send Reset Link</button>
+          <button className="h-12 w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition" onClick={submit}>Send reset link</button>
         </div>
 
         <div className="mt-4 text-center text-sm">
