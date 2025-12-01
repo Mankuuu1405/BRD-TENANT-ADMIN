@@ -1,15 +1,14 @@
-import { HomeIcon, UsersIcon, ChartBarIcon, DocumentTextIcon, CubeIcon, ShieldCheckIcon, ServerStackIcon, Cog6ToothIcon, ArrowLeftOnRectangleIcon, LinkIcon, BanknotesIcon, UserCircleIcon, CreditCardIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, UsersIcon, CalendarDaysIcon, DocumentTextIcon, CubeIcon, ShieldCheckIcon, ServerStackIcon, Cog6ToothIcon, ArrowLeftOnRectangleIcon, LinkIcon, BanknotesIcon, UserCircleIcon, CreditCardIcon, KeyIcon } from '@heroicons/react/24/outline'
 
 const items = [
   { key: 'dashboard', label: 'Dashboard', icon: HomeIcon },
-  { key: 'integrations', label: 'Integrations ', icon: ServerStackIcon },
-  { key: 'loans', label: 'Loans', icon: ShieldCheckIcon },
-  { key: 'logs', label: 'Logs', icon: DocumentTextIcon },
-  { key: 'users', label: 'Users', icon: UsersIcon },
-  { key: 'reports', label: 'Reports', icon: ChartBarIcon },
-  { key: 'tenants', label: 'Tenants', icon: CubeIcon },
-  { key: 'roles_permissions', label: 'Roles & Permissions', icon: ShieldCheckIcon },
-  { key: 'settings', label: ' System Settings', icon: Cog6ToothIcon }
+  { key: 'branches', label: 'Branches', icon: ServerStackIcon },
+  { key: 'loans', label: 'Loans', icon: BanknotesIcon },
+  { key: 'users', label: 'Users', icon: UserCircleIcon },
+  { key: 'calendar', label: 'Calendar', icon: CalendarDaysIcon },
+  { key: 'tenants', label: 'Product Loan', icon: CubeIcon },
+  { key: 'roles_permissions', label: 'Roles & Permissions', icon: KeyIcon },
+  { key: 'settings', label: 'System Settings', icon: Cog6ToothIcon }
 ]
 
 export default function Sidebar({ activeKey, onNavigate }) {
@@ -28,9 +27,13 @@ export default function Sidebar({ activeKey, onNavigate }) {
         {items.map(({ key, label, icon: Icon }) => (
           <button onClick={() => onNavigate && key && onNavigate(key)} key={label} className={`w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg ${key && activeKey===key ? 'text-primary-700 bg-primary-50' : 'text-gray-700 hover:bg-gray-50'}`}>
             <Icon className="h-5 w-5" />
-            <span>{label}</span>
+            <span className="whitespace-nowrap">{label}</span>
           </button>
         ))}
+        <button onClick={() => onNavigate && onNavigate('internal_team_management')} className={`w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg ${activeKey==='internal_team_management' ? 'text-primary-700 bg-primary-50' : 'text-gray-700 hover:bg-gray-50'}`}>
+          <UsersIcon className="h-5 w-5" />
+          <span className="whitespace-nowrap">Internal team management</span>
+        </button>
         <button onClick={() => {
           if (activeKey === 'dashboard') {
             window.dispatchEvent(new CustomEvent('open-subscription-plan'))
@@ -41,6 +44,14 @@ export default function Sidebar({ activeKey, onNavigate }) {
         }} className="w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg text-gray-700 hover:bg-gray-50">
           <CreditCardIcon className="h-5 w-5" />
           <span>Subscription & Plan</span>
+        </button>
+        <button onClick={() => onNavigate && onNavigate('rules')} className={`w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg ${activeKey==='rules' ? 'text-primary-700 bg-primary-50' : 'text-gray-700 hover:bg-gray-50'}`}>
+          <DocumentTextIcon className="h-5 w-5" />
+          <span className="whitespace-nowrap">Rules</span>
+        </button>
+        <button onClick={() => onNavigate && onNavigate('categories')} className={`w-full flex items-center gap-3 px-4 py-2 text-base rounded-lg ${activeKey==='categories' ? 'text-primary-700 bg-primary-50' : 'text-gray-700 hover:bg-gray-50'}`}>
+          <LinkIcon className="h-5 w-5" />
+          <span className="whitespace-nowrap">Type of category</span>
         </button>
       </nav>
       <div className="p-2 border-t border-gray-100">
