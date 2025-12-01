@@ -68,8 +68,8 @@ export default function Dashboard() {
         <div className="bg-white rounded-xl shadow-card p-4 border border-gray-100">
           <div className="text-sm font-medium mb-2">Quick Actions</div>
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => { try { sessionStorage.setItem('open_branch_create','1') } catch {}; window.dispatchEvent(new CustomEvent('navigate', { detail: 'branches' })) }} className="h-20 rounded-lg bg-primary-50 text-primary-700">Add Branch</button>
-            <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'calendar' }))} className="h-20 rounded-lg bg-green-50 text-green-700">View Calendar</button>
+            <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'tenants' }))} className="h-20 rounded-lg bg-primary-50 text-primary-700">Add Tenant</button>
+            <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'reports' }))} className="h-20 rounded-lg bg-green-50 text-green-700">View Reports</button>
             <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }))} className="h-20 rounded-lg bg-purple-50 text-purple-700">System Settings</button>
             <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'notifications' }))} className="h-20 rounded-lg bg-amber-50 text-amber-700">Notifications</button>
             <button onClick={() => setPlanOpen(true)} className="h-20 rounded-lg bg-blue-50 text-blue-700">Subscription & Plan Details</button>
