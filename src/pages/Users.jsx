@@ -15,10 +15,13 @@ export default function Users() {
   const [roles, setRoles] = useState([])
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
   const [creating, setCreating] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', phone_number: '', role_id: '' })
   const [editingId, setEditingId] = useState(null)
   const [editingRole, setEditingRole] = useState('')
+  const [viewing, setViewing] = useState(null)
+  const [deleting, setDeleting] = useState(null)
 
   const load = async () => {
     setError(null)
@@ -38,20 +41,29 @@ export default function Users() {
     return c
   }, [items])
 
+  const filteredItems = useMemo(() => items.filter(u => {
+    if (statusFilter !== 'All' && u.status !== statusFilter) return false
+    return true
+  }), [items, statusFilter])
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
           <div className="text-xl font-semibold">Users</div>
         </div>
-        <button className="h-9 px-3 rounded-lg bg-primary-600 text-white" onClick={()=>{ setCreating(true); setForm({ name: '', email: '', phone_number: '', role_id: roles[0]?.role_id || '' }) }}>+ Add User</button>
+        <button className="h-9 px-3 rounded-lg bg-primary-600 text-white" onClick={()=>{ const firstRole = roles.find(r=>!r.is_system_role) || roles[0]; setCreating(true); setForm({ name: '', email: '', phone_number: '', role_id: firstRole?.role_id || '' }) }}>+ Add User</button>
       </div>
 
       <div className="flex items-center gap-2">
-        <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search name, email, phone" className="h-9 w-72 rounded-lg border border-gray-300 px-3" />
-        <div className="ml-auto flex items-center gap-2 text-sm">
-          {Object.keys(counts).map(k => (<span key={k} className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">{k}: {counts[k]}</span>))}
+        <div className="flex items-center gap-2 text-sm">
+          <button className={`px-3 py-1 rounded-full border ${statusFilter==='All' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={()=>setStatusFilter('All')}>All</button>
+          <button className={`px-3 py-1 rounded-full border ${statusFilter==='Active' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={()=>setStatusFilter('Active')}>Active ({counts.Active})</button>
+          <button className={`px-3 py-1 rounded-full border ${statusFilter==='Inactive' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={()=>setStatusFilter('Inactive')}>Inactive ({counts.Inactive})</button>
+          <button className={`px-3 py-1 rounded-full border ${statusFilter==='Pending Activation' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={()=>setStatusFilter('Pending Activation')}>Pending Activation ({counts['Pending Activation']})</button>
         </div>
+        <input value={search} onChange={(e)=>setSearch(e.target.value)} onKeyDown={(e)=>{ if (e.key==='Enter') load() }} placeholder="Search name, email or phone" className="h-9 w-72 rounded-lg border border-gray-300 px-3 ml-auto" />
+        <button onClick={load} className="h-9 px-3 rounded-lg border border-gray-200">Search</button>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-x-auto">
@@ -63,11 +75,11 @@ export default function Users() {
               <th className="px-4 py-3">Phone</th>
               <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Action</th>
+              <th className="px-4 py-3">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {items.map(u => (
+            {filteredItems.map(u => (
               <tr key={u.user_id} className="border-t border-gray-100">
                 <td className="px-4 py-3 font-medium">{u.name}</td>
                 <td className="px-4 py-3">{u.email}</td>
@@ -75,7 +87,7 @@ export default function Users() {
                 <td className="px-4 py-3">
                   {editingId===u.user_id ? (
                     <select value={editingRole} onChange={(e)=>setEditingRole(e.target.value)} className="h-9 rounded-lg border border-gray-300 px-3">
-                      {roles.map(r => (<option key={r.role_id} value={r.role_id}>{r.role_name}</option>))}
+                      {roles.filter(r=>r.role_name!=='Super Admin').map(r => (<option key={r.role_id} value={r.role_id}>{r.role_name}</option>))}
                     </select>
                   ) : (
                     <span>{u.role_name}</span>
@@ -89,7 +101,11 @@ export default function Users() {
                       <button className="h-8 px-3 rounded-lg bg-primary-600 text-white" onClick={async ()=>{ const r = await usersApi.update(u.user_id, { role_id: editingRole }); if (r.ok) { setEditingId(null); setEditingRole(''); load() } }}>Save</button>
                     </>
                   ) : (
-                    <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={()=>{ setEditingId(u.user_id); setEditingRole(roles.find(r=>r.role_name===u.role_name)?.role_id || roles[0]?.role_id || '') }}>Edit</button>
+                    <>
+                      <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={()=>setViewing(u)}>View</button>
+                      <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={()=>{ setEditingId(u.user_id); setEditingRole(roles.find(r=>r.role_name===u.role_name)?.role_id || roles[0]?.role_id || '') }}>Edit</button>
+                      <button className="h-8 px-3 rounded-lg border border-red-200 text-red-700" onClick={()=>setDeleting(u)}>Delete</button>
+                    </>
                   )}
                 </td>
               </tr>
@@ -117,14 +133,46 @@ export default function Users() {
               </label>
               <label className="block">
                 <div className="text-sm text-gray-700">Role</div>
-                <select value={form.role_id} onChange={(e)=>setForm({ ...form, role_id: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
-                  {roles.map(r => (<option key={r.role_id} value={r.role_id}>{r.role_name}</option>))}
-                </select>
-              </label>
-              <div className="flex justify-end gap-2">
+                    <select value={form.role_id} onChange={(e)=>setForm({ ...form, role_id: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
+                      {roles.filter(r=>r.role_name!=='Super Admin').map(r => (<option key={r.role_id} value={r.role_id}>{r.role_name}</option>))}
+                    </select>
+                  </label>
+                  <div className="flex justify-end gap-2">
                 <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>setCreating(false)}>Cancel</button>
                 <button className="h-9 px-3 rounded-lg bg-primary-600 text-white" onClick={async ()=>{ const r = await usersApi.create(form); if (r.ok) { setCreating(false); load() } }}>Create</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewing && (
+        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={()=>setViewing(null)}>
+          <div className="bg-white w-full max-w-lg rounded-xl border border-gray-200 shadow-card p-4" onClick={(e)=>e.stopPropagation()}>
+            <div className="text-lg font-semibold">User Detail</div>
+            <div className="mt-3 text-sm space-y-1">
+              <div className="font-medium">{viewing.name}</div>
+              <div>Email: {viewing.email}</div>
+              <div>Phone: {viewing.phone_number || '-'}</div>
+              <div>Role: {viewing.role_name}</div>
+              <div>Status: <span className={statusBadge(viewing.status)}>{viewing.status}</span></div>
+              <div>Last Login: {viewing.last_login || '-'}</div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>setViewing(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleting && (
+        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={()=>setDeleting(null)}>
+          <div className="bg-white w-full max-w-md rounded-xl border border-gray-200 shadow-card p-4" onClick={(e)=>e.stopPropagation()}>
+            <div className="text-lg font-semibold">Delete User</div>
+            <div className="mt-2 text-sm text-gray-700">Are you sure you want to delete "{deleting.name}"?</div>
+            <div className="mt-3 flex justify-end gap-2">
+              <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>setDeleting(null)}>Cancel</button>
+              <button className="h-9 px-3 rounded-lg bg-red-600 text-white" onClick={async ()=>{ const r = await usersApi.delete(deleting.user_id); if (r.ok) { setDeleting(null); load() } }}>Delete</button>
             </div>
           </div>
         </div>
