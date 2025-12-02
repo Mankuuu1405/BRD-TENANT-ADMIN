@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { tenantsApi } from '../utils/api.js'
 
 const statusBadge = (s) => {
   const map = {
@@ -7,7 +8,6 @@ const statusBadge = (s) => {
   }
   return `inline-flex items-center px-3 py-1 rounded-full text-sm border ${map[s] || 'bg-gray-50 text-gray-700 border-gray-200'}`
 }
-import { tenantsApi } from '../utils/api.js'
 
 const LOAN_TYPES = [
   'Payday Loan (Short-term Loan)',
@@ -28,64 +28,85 @@ const LOAN_TYPES = [
 ]
 
 export default function Loans() {
-  const demoLoans = [
-    { loan_id: 'DL001', tenant_id: 'tenant-001', applicant_name: 'Amit Sharma', amount: 500000, term_months: 12, applied_on: new Date().toISOString(), status: 'Pending' },
-    { loan_id: 'DL002', tenant_id: 'tenant-001', applicant_name: 'Neha Verma', amount: 750000, term_months: 18, applied_on: new Date().toISOString(), status: 'Approved' },
-    { loan_id: 'DL003', tenant_id: 'tenant-002', applicant_name: 'Rahul Mehta', amount: 300000, term_months: 24, applied_on: new Date().toISOString(), status: 'Rejected' },
-    { loan_id: 'DL004', tenant_id: 'tenant-003', applicant_name: 'Vikram Singh', amount: 650000, term_months: 36, applied_on: new Date().toISOString(), status: 'Disbursed' }
-  ]
-  const [items, setItems] = useState(demoLoans)
-  const [allItems, setAllItems] = useState(demoLoans)
-  const [loading, setLoading] = useState(false)
+  // 1. Initialize empty state (Removed demoLoans which had wrong data structure)
+  const [items, setItems] = useState([])
+  const [tenants, setTenants] = useState([])
   const [error, setError] = useState(null)
+  
+  // UI States
   const [creating, setCreating] = useState(false)
   const [viewing, setViewing] = useState(null)
   const [editing, setEditing] = useState(null)
   const [deleting, setDeleting] = useState(null)
   const [modalError, setModalError] = useState(null)
+  
+  // Filter States
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
-  const [form, setForm] = useState({ tenant_id: '', business_name: '', type_of_loan: '', status: 'Active', subcategory: '' })
+  
+  const [form, setForm] = useState({ tenant_id: '', business_name: '', type_of_loan: LOAN_TYPES[0], status: 'Active', subcategory: '' })
 
+  // 2. Load Tenants & Create Mock Product Data
   const loadTenants = async () => {
     setError(null)
     const res = await tenantsApi.list()
     if (res.ok) {
       setTenants(res.data || [])
-      const t1 = (res.data || []).find(x => x.tenant_id==='tenant-001')
-      const t2 = (res.data || []).find(x => x.tenant_id==='tenant-002')
+      const t1 = (res.data || []).find(x => x.tenant_id === 'tenant-001')
+      const t2 = (res.data || []).find(x => x.tenant_id === 'tenant-002')
+      
+      // Creating data that matches your "Loan Types" table columns
       setItems([
-        { tenant_id: t1?.tenant_id || 'tenant-001', business_name: t1?.company_name || 'Metro Credit', type_of_loan: 'Personal Loan (Unsecured)', status: 'Active', subcategory: 'Unsecured' },
-        { tenant_id: t1?.tenant_id || 'tenant-001', business_name: t1?.company_name || 'Metro Credit', type_of_loan: 'Loan Against Property (LAP)', status: 'Inactive', subcategory: 'Secured' },
-        { tenant_id: t2?.tenant_id || 'tenant-002', business_name: t2?.company_name || 'Sunrise Capital', type_of_loan: 'Business Loan', status: 'Active', subcategory: 'Unsecured' }
+        { 
+          tenant_id: t1?.tenant_id || 'tenant-001', 
+          business_name: t1?.company_name || 'Metro Credit', 
+          type_of_loan: 'Personal Loan (Unsecured)', 
+          status: 'Active', 
+          subcategory: 'Unsecured' 
+        },
+        { 
+          tenant_id: t1?.tenant_id || 'tenant-001', 
+          business_name: t1?.company_name || 'Metro Credit', 
+          type_of_loan: 'Loan Against Property (LAP)', 
+          status: 'Inactive', 
+          subcategory: 'Secured' 
+        },
+        { 
+          tenant_id: t2?.tenant_id || 'tenant-002', 
+          business_name: t2?.company_name || 'Sunrise Capital', 
+          type_of_loan: 'Business Loan', 
+          status: 'Active', 
+          subcategory: 'Unsecured' 
+        }
       ])
-    } else setError('Unable to load tenants')
+    } else {
+      setError('Unable to load tenants')
+    }
   }
 
   useEffect(() => { loadTenants() }, [])
 
+  // 3. ⭐ FIXED: Added the missing filteredItems logic
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      // Filter by Status
+      if (statusFilter !== 'All' && item.status !== statusFilter) return false
+      
+      // Filter by Search (Business Name or Loan Type)
+      const s = search.toLowerCase()
+      return (
+        (item.business_name || '').toLowerCase().includes(s) ||
+        (item.type_of_loan || '').toLowerCase().includes(s)
+      )
+    })
+  }, [items, search, statusFilter])
+
+  // Calculate counts for badges
   const counts = useMemo(() => {
-    const c = { All: allItems.length, Pending: 0, Approved: 0, Rejected: 0 }
-    allItems.forEach(i => { if (c[i.status] !== undefined) c[i.status]++ })
+    const c = { Active: 0, Inactive: 0 }
+    items.forEach(i => { if (c[i.status] !== undefined) c[i.status]++ })
     return c
-  }, [allItems])
-
-  const load = async () => {
-    setLoading(true)
-    setError(null)
-    const resAll = await loansApi.list({ search })
-    if (resAll.ok) setAllItems(resAll.data && resAll.data.length ? resAll.data : demoLoans)
-    else setAllItems(demoLoans)
-    const res = await loansApi.list({ status_filter: statusFilter !== 'All' ? statusFilter : undefined, search })
-    setLoading(false)
-    if (res.ok) setItems(res.data && res.data.length ? res.data : demoLoans)
-    else {
-      setItems(demoLoans)
-      setError('Unable to load loans')
-    }
-  }
-
-  useEffect(() => { load() }, [statusFilter])
+  }, [items])
 
   return (
     <div className="p-4 space-y-4">
@@ -101,11 +122,11 @@ export default function Loans() {
 
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <button className={`px-3 py-1 rounded-full border ${statusFilter==='All' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={()=>setStatusFilter('All')}>All</button>
-          <button className={`px-3 py-1 rounded-full border ${statusFilter==='Active' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={()=>setStatusFilter('Active')}>Active ({counts.Active})</button>
-          <button className={`px-3 py-1 rounded-full border ${statusFilter==='Inactive' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={()=>setStatusFilter('Inactive')}>Inactive ({counts.Inactive})</button>
+          <button className={`px-3 py-1 rounded-full border ${statusFilter === 'All' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={() => setStatusFilter('All')}>All</button>
+          <button className={`px-3 py-1 rounded-full border ${statusFilter === 'Active' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={() => setStatusFilter('Active')}>Active ({counts.Active})</button>
+          <button className={`px-3 py-1 rounded-full border ${statusFilter === 'Inactive' ? 'border-primary-300 text-primary-700 bg-primary-50' : 'border-gray-200 text-gray-700 bg-white'}`} onClick={() => setStatusFilter('Inactive')}>Inactive ({counts.Inactive})</button>
         </div>
-        <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search business or loan type" className="h-9 w-72 rounded-lg border border-gray-300 px-3 ml-auto" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search business or loan type" className="h-9 w-72 rounded-lg border border-gray-300 px-3 ml-auto" />
         <button className="h-9 px-3 rounded-lg border border-gray-200">Search</button>
       </div>
 
@@ -130,9 +151,9 @@ export default function Loans() {
                 <td className="px-4 py-3">{b.subcategory || '-'}</td>
                 <td className="px-4 py-3"><span className={statusBadge(b.status)}>{b.status}</span></td>
                 <td className="px-4 py-3 flex gap-2">
-                  <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={()=>setViewing(b)}>View</button>
-                  <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={()=>setEditing({ ...b, _idx: idx })}>Edit</button>
-                  <button className="h-8 px-3 rounded-lg border border-red-200 text-red-700" onClick={()=>setDeleting({ ...b, _idx: idx })}>Delete</button>
+                  <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={() => setViewing(b)}>View</button>
+                  <button className="h-8 px-3 rounded-lg border border-gray-200" onClick={() => setEditing({ ...b, _idx: idx })}>Edit</button>
+                  <button className="h-8 px-3 rounded-lg border border-red-200 text-red-700" onClick={() => setDeleting({ ...b, _idx: idx })}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -146,15 +167,15 @@ export default function Loans() {
       </div>
 
       {creating && (
-        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={()=>{ setCreating(false); setModalError(null) }}>
-          <div className="bg-white w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-xl border border-gray-200 shadow-card p-4" onClick={(e)=>e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={() => { setCreating(false); setModalError(null) }}>
+          <div className="bg-white w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-xl border border-gray-200 shadow-card p-4" onClick={(e) => e.stopPropagation()}>
             <div className="text-lg font-semibold">Add Loan Type</div>
             <div className="mt-3 space-y-3">
               {modalError && <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg p-2 text-sm">{modalError}</div>}
               <div className="grid grid-cols-2 gap-3">
                 <label className="block col-span-2">
                   <div className="text-sm text-gray-700">Business Name</div>
-                  <select value={form.business_name} onChange={(e)=>{
+                  <select value={form.business_name} onChange={(e) => {
                     const name = e.target.value
                     const t = tenants.find(x => x.company_name === name)
                     setForm({ ...form, business_name: name, tenant_id: t?.tenant_id || '' })
@@ -167,11 +188,11 @@ export default function Loans() {
                 </label>
                 <label className="block">
                   <div className="text-sm text-gray-700">Tenant ID</div>
-                  <input value={form.tenant_id} onChange={(e)=>setForm({ ...form, tenant_id: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3" placeholder="auto-filled" />
+                  <input value={form.tenant_id} onChange={(e) => setForm({ ...form, tenant_id: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3" placeholder="auto-filled" />
                 </label>
                 <label className="block">
                   <div className="text-sm text-gray-700">Type of Loan</div>
-                  <select value={form.type_of_loan} onChange={(e)=>setForm({ ...form, type_of_loan: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
+                  <select value={form.type_of_loan} onChange={(e) => setForm({ ...form, type_of_loan: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
                     {LOAN_TYPES.map(t => (<option key={t} value={t}>{t}</option>))}
                   </select>
                 </label>
@@ -180,14 +201,14 @@ export default function Loans() {
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
                   <div className="text-sm text-gray-700">Status</div>
-                  <select value={form.status} onChange={(e)=>setForm({ ...form, status: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
+                  <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
                     <option>Active</option>
                     <option>Inactive</option>
                   </select>
                 </label>
                 <label className="block">
                   <div className="text-sm text-gray-700">Category (Optional)</div>
-                  <select value={form.subcategory} onChange={(e)=>setForm({ ...form, subcategory: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
+                  <select value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
                     <option value="">Select</option>
                     <option value="Unsecured">Unsecured</option>
                     <option value="Secured">Secured</option>
@@ -197,14 +218,14 @@ export default function Loans() {
 
               {form.subcategory && (
                 <div className="text-xs text-gray-600">
-                  {form.subcategory==='Unsecured' ? 'KYC + income check, Bureau scoring, Limit sanction, Usage monitoring, Interest on used amount' : 'KYC + pledge (FD/property), Valuation, LTV calculation, Limit approval, Overdraft via virtual account'}
+                  {form.subcategory === 'Unsecured' ? 'KYC + income check, Bureau scoring, Limit sanction, Usage monitoring, Interest on used amount' : 'KYC + pledge (FD/property), Valuation, LTV calculation, Limit approval, Overdraft via virtual account'}
                 </div>
               )}
 
               <div className="sticky bottom-0 bg-white pt-2 flex justify-end gap-2">
-                <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>{ setCreating(false); setModalError(null) }}>Cancel</button>
+                <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={() => { setCreating(false); setModalError(null) }}>Cancel</button>
                 <button className="h-9 px-3 rounded-lg bg-primary-600 text-white" onClick={() => {
-                  const tname = form.business_name || (tenants.find(x => x.tenant_id===form.tenant_id)?.company_name || '')
+                  const tname = form.business_name || (tenants.find(x => x.tenant_id === form.tenant_id)?.company_name || '')
                   if (!tname || !form.type_of_loan) { setModalError('Business and Loan Type are required'); return }
                   setItems([...items, { ...form, business_name: tname }])
                   setCreating(false)
@@ -217,8 +238,8 @@ export default function Loans() {
       )}
 
       {viewing && (
-        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={()=>setViewing(null)}>
-          <div className="bg-white w-full max-w-lg rounded-xl border border-gray-200 shadow-card p-4" onClick={(e)=>e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={() => setViewing(null)}>
+          <div className="bg-white w-full max-w-lg rounded-xl border border-gray-200 shadow-card p-4" onClick={(e) => e.stopPropagation()}>
             <div className="text-lg font-semibold">Loan Type Detail</div>
             <div className="mt-3 text-sm space-y-1">
               <div className="font-medium">{viewing.business_name}</div>
@@ -227,25 +248,25 @@ export default function Loans() {
               <div>Status: {viewing.status}</div>
             </div>
             <div className="mt-4 flex justify-end">
-              <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>setViewing(null)}>Close</button>
+              <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={() => setViewing(null)}>Close</button>
             </div>
           </div>
         </div>
       )}
 
       {editing && (
-        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={()=>setEditing(null)}>
-          <div className="bg-white w-full max-w-2xl rounded-xl border border-gray-200 shadow-card p-4" onClick={(e)=>e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={() => setEditing(null)}>
+          <div className="bg-white w-full max-w-2xl rounded-xl border border-gray-200 shadow-card p-4" onClick={(e) => e.stopPropagation()}>
             <div className="text-lg font-semibold">Edit Loan Type</div>
             <div className="mt-3 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
                   <div className="text-sm text-gray-700">Business Name</div>
-                  <input value={editing.business_name} onChange={(e)=>setEditing({ ...editing, business_name: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3" />
+                  <input value={editing.business_name} onChange={(e) => setEditing({ ...editing, business_name: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3" />
                 </label>
                 <label className="block">
                   <div className="text-sm text-gray-700">Type of Loan</div>
-                  <select value={editing.type_of_loan} onChange={(e)=>setEditing({ ...editing, type_of_loan: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
+                  <select value={editing.type_of_loan} onChange={(e) => setEditing({ ...editing, type_of_loan: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
                     {LOAN_TYPES.map(t => (<option key={t} value={t}>{t}</option>))}
                   </select>
                 </label>
@@ -253,14 +274,14 @@ export default function Loans() {
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
                   <div className="text-sm text-gray-700">Status</div>
-                  <select value={editing.status} onChange={(e)=>setEditing({ ...editing, status: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
+                  <select value={editing.status} onChange={(e) => setEditing({ ...editing, status: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
                     <option>Active</option>
                     <option>Inactive</option>
                   </select>
                 </label>
                 <label className="block">
                   <div className="text-sm text-gray-700">Category (Optional)</div>
-                  <select value={editing.subcategory} onChange={(e)=>setEditing({ ...editing, subcategory: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
+                  <select value={editing.subcategory} onChange={(e) => setEditing({ ...editing, subcategory: e.target.value })} className="mt-1 w-full h-9 rounded-lg border border-gray-300 px-3">
                     <option value="">Select</option>
                     <option value="Unsecured">Unsecured</option>
                     <option value="Secured">Secured</option>
@@ -268,8 +289,8 @@ export default function Loans() {
                 </label>
               </div>
               <div className="flex justify-end gap-2">
-                <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>setEditing(null)}>Cancel</button>
-                <button className="h-9 px-3 rounded-lg bg-primary-600 text-white" onClick={()=>{
+                <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={() => setEditing(null)}>Cancel</button>
+                <button className="h-9 px-3 rounded-lg bg-primary-600 text-white" onClick={() => {
                   const list = [...items]
                   list[editing._idx] = { ...list[editing._idx], business_name: editing.business_name, type_of_loan: editing.type_of_loan, status: editing.status, subcategory: editing.subcategory }
                   setItems(list)
@@ -282,13 +303,13 @@ export default function Loans() {
       )}
 
       {deleting && (
-        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={()=>setDeleting(null)}>
-          <div className="bg-white w-full max-w-md rounded-xl border border-gray-200 shadow-card p-4" onClick={(e)=>e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/25 grid place-items-center z-40" onClick={() => setDeleting(null)}>
+          <div className="bg-white w-full max-w-md rounded-xl border border-gray-200 shadow-card p-4" onClick={(e) => e.stopPropagation()}>
             <div className="text-lg font-semibold">Delete Loan Type</div>
             <div className="mt-2 text-sm text-gray-700">Are you sure you want to delete "{deleting.type_of_loan}"?</div>
             <div className="mt-3 flex justify-end gap-2">
-              <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>setDeleting(null)}>Cancel</button>
-              <button className="h-9 px-3 rounded-lg bg-red-600 text-white" onClick={()=>{ setItems(items.filter((_,i)=>i!==deleting._idx)); setDeleting(null) }}>Delete</button>
+              <button className="h-9 px-3 rounded-lg border border-gray-200" onClick={() => setDeleting(null)}>Cancel</button>
+              <button className="h-9 px-3 rounded-lg bg-red-600 text-white" onClick={() => { setItems(items.filter((_, i) => i !== deleting._idx)); setDeleting(null) }}>Delete</button>
             </div>
           </div>
         </div>
