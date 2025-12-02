@@ -1,94 +1,70 @@
 import { useEffect, useState } from 'react'
-import { BellIcon } from '@heroicons/react/24/outline'
 import { settingsApi } from '../utils/api.js'
-
-const Field = ({ s, onChange }) => {
-  const masked = s.is_encrypted && !s.reveal
-  const label = s.key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
-  if (s.data_type === 'BOOLEAN') {
-    return (
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={s.value === 'true'} onChange={(e)=>onChange(s.key, e.target.checked ? 'true' : 'false')} />
-        <span>{label}</span>
-      </label>
-    )
-  }
-  return (
-    <div className="space-y-1">
-      <div className="text-sm text-gray-700">{label}</div>
-      <div className="flex gap-2">
-        <input type="text" value={masked ? '••••••' : s.value} onChange={(e)=>!masked && onChange(s.key, e.target.value)} className="flex-1 h-9 rounded-lg border border-gray-300 px-3" />
-        {s.is_encrypted && (
-          <button type="button" className="h-9 px-3 rounded-lg border border-gray-200" onClick={()=>onChange(s.key, s.value, { reveal: !s.reveal })}>{s.reveal ? 'Hide' : 'Reveal'}</button>
-        )}
-      </div>
-    </div>
-  )
-}
+import axios from '../utils/axiosInstance.js' // Direct call for specific admin panels
 
 export default function Settings() {
-  const [loan, setLoan] = useState([])
-  const [system, setSystem] = useState([])
-  const [notify, setNotify] = useState([])
-  const [saving, setSaving] = useState(false)
+  const [charges, setCharges] = useState([])
+  const [templates, setTemplates] = useState([])
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  // Load real settings from AdminPanel apps
   const load = async () => {
+    setLoading(true)
     setError(null)
-    const res = await settingsApi.list()
-    if (res.ok) {
-      const addReveal = (arr) => arr.map(s => ({ ...s, reveal: false }))
-      setLoan(addReveal(res.data.loan))
-      setSystem(addReveal(res.data.system))
-      setNotify(addReveal(res.data.notify))
-    } else setError('Unable to load settings')
+    try {
+      // Fetch Charges & Notification Templates as "Settings"
+      const [resCharges, resTemplates] = await Promise.all([
+        axios.get('/api/v1/adminpanel/charges/'),
+        axios.get('/api/v1/adminpanel/notification-templates/')
+      ])
+      setCharges(resCharges.data)
+      setTemplates(resTemplates.data)
+    } catch (e) {
+      setError('Unable to load settings from backend')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [])
 
-  const mutate = (groupSetter, group) => (key, value, extra = {}) => {
-    groupSetter(group.map(s => s.key===key ? { ...s, value, ...extra } : s))
-  }
-
-  const save = async () => {
-    setSaving(true)
-    const map = {}
-    ;[...loan, ...system, ...notify].forEach(s => { map[s.key] = s.value })
-    const r = await settingsApi.update(map)
-    setSaving(false)
-    if (r.ok) await load()
-  }
-
-
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex flex-col">
-          <div className="text-xl font-semibold">System Settings</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button disabled={saving} className="h-9 px-3 rounded-lg bg-primary-600 text-white disabled:opacity-60" onClick={save}>Save Changes</button>
-        </div>
+        <div className="text-xl font-semibold">System Settings</div>
+        <button onClick={load} className="h-9 px-3 rounded-lg bg-primary-600 text-white">Refresh</button>
       </div>
       {error && <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg p-3">{error}</div>}
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {/* Charges Section (Real Data) */}
         <div className="bg-white rounded-xl shadow-card p-4 border border-gray-100">
-          <div className="text-sm font-medium mb-2">Loan Configuration</div>
-          <div className="space-y-3">
-            {loan.map(s => <Field key={s.key} s={s} onChange={mutate(setLoan, loan)} />)}
+          <div className="text-sm font-medium mb-3">Global Charges (Fees & Penalties)</div>
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {charges.map(c => (
+              <div key={c.id} className="flex justify-between items-center text-sm border-b border-gray-50 pb-2">
+                <div>{c.name} ({c.charge_type})</div>
+                <div className="font-semibold">{c.value} {c.is_percentage ? '%' : 'INR'}</div>
+              </div>
+            ))}
+            {!charges.length && <div className="text-gray-500 text-sm">No charges configured</div>}
           </div>
         </div>
+
+        {/* Notifications Section (Real Data) */}
         <div className="bg-white rounded-xl shadow-card p-4 border border-gray-100">
-          <div className="text-sm font-medium mb-2">System & Security</div>
-          <div className="space-y-3">
-            {system.map(s => <Field key={s.key} s={s} onChange={mutate(setSystem, system)} />)}
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-card p-4 border border-gray-100">
-          <div className="text-sm font-medium mb-2">Notifications & Email</div>
-          <div className="space-y-3">
-            {notify.map(s => <Field key={s.key} s={s} onChange={mutate(setNotify, notify)} />)}
+          <div className="text-sm font-medium mb-3">Notification Templates</div>
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {templates.map(t => (
+              <div key={t.id} className="flex justify-between items-center text-sm border-b border-gray-50 pb-2">
+                <div>{t.name} ({t.template_type})</div>
+                <div className={`px-2 py-0.5 rounded text-xs ${t.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100'}`}>
+                  {t.is_active ? 'Active' : 'Inactive'}
+                </div>
+              </div>
+            ))}
+            {!templates.length && <div className="text-gray-500 text-sm">No templates found</div>}
           </div>
         </div>
       </div>
