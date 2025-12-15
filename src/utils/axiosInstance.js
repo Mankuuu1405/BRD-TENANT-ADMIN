@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // .env फाइल से बेस URL लें (जैसे: http://127.0.0.1:8000)
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://13.234.113.42:8000';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
