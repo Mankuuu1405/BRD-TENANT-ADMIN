@@ -1,22 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPinIcon, TrashIcon, PlusIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { riskAPI } from "../services/riskService";
 
 export default function GeoFencingMap() {
-  const [blockedZones, setBlockedZones] = useState([
-    { id: 1, pincode: "110001", city: "New Delhi", reason: "High Delinquency", risk_level: "High" },
-    { id: 2, pincode: "400017", city: "Mumbai", reason: "Fraud Zone", risk_level: "Critical" },
-  ]);
-
+  const [blockedZones, setBlockedZones] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [newZone, setNewZone] = useState({ pincode: "", city: "", reason: "", risk_level: "High" });
 
-  const handleAddZone = () => {
-    if (!newZone.pincode || !newZone.city) return alert("Enter PIN and City");
-    setBlockedZones([...blockedZones, { ...newZone, id: Date.now() }]);
-    setNewZone({ pincode: "", city: "", reason: "", risk_level: "High" });
+  useEffect(() => {
+    fetchZones();
+  }, []);
+
+  const fetchZones = async () => {
+    setLoading(true);
+    try {
+      const res = await riskAPI.getBlockedZones();
+      setBlockedZones(res.data);
+    } catch (e) {
+      console.error("Error fetching zones");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    setBlockedZones(blockedZones.filter(z => z.id !== id));
+  const handleAddZone = async () => {
+    if (!newZone.pincode || !newZone.city) return;
+    try {
+      await riskAPI.createBlockedZone(newZone); // 2. Post to API
+      fetchZones(); // 3. Refresh list
+      setNewZone({ pincode: "", city: "", reason: "", risk_level: "High" });
+    } catch (e) { alert("Could not add zone"); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this zone?")) return;
+    try {
+      await riskAPI.deleteBlockedZone(id);
+      fetchZones(); 
+    } catch (e) {
+      alert("Delete failed");
+    }
   };
 
   return (
@@ -24,15 +47,15 @@ export default function GeoFencingMap() {
       <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <div>
           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <MapPinIcon className="h-5 w-5 text-primary-600" /> 
+            <MapPinIcon className="h-5 w-5 text-primary-600" />
             Negative Area Mapping
           </h3>
           <p className="text-xs text-slate-500 mt-1">Define geo-fences where lending is restricted.</p>
         </div>
         <div className="flex gap-2">
-           <span className="text-[10px] font-bold bg-rose-100 text-rose-700 px-2 py-1 rounded border border-rose-200">
-             {blockedZones.length} Active Zones
-           </span>
+          <span className="text-[10px] font-bold bg-rose-100 text-rose-700 px-2 py-1 rounded border border-rose-200">
+            {blockedZones.length} Active Zones
+          </span>
         </div>
       </div>
 
@@ -40,43 +63,43 @@ export default function GeoFencingMap() {
         {/* Input Form */}
         <div className="p-6 border-r border-slate-100 bg-white space-y-4">
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Add Restricted Zone</h4>
-          
+
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Pincode</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               maxLength="6"
               className="w-full p-2 border border-slate-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
               value={newZone.pincode}
-              onChange={e => setNewZone({...newZone, pincode: e.target.value})}
+              onChange={e => setNewZone({ ...newZone, pincode: e.target.value })}
               placeholder="e.g. 110059"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">City / Area Name</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
               value={newZone.city}
-              onChange={e => setNewZone({...newZone, city: e.target.value})}
+              onChange={e => setNewZone({ ...newZone, city: e.target.value })}
               placeholder="e.g. Uttam Nagar"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Risk Level</label>
-            <select 
+            <select
               className="w-full p-2 border border-slate-300 rounded-lg text-sm outline-none"
               value={newZone.risk_level}
-              onChange={e => setNewZone({...newZone, risk_level: e.target.value})}
+              onChange={e => setNewZone({ ...newZone, risk_level: e.target.value })}
             >
               <option value="High">High (Manual Review)</option>
               <option value="Critical">Critical (Auto Reject)</option>
             </select>
           </div>
 
-          <button 
+          <button
             onClick={handleAddZone}
             className="w-full py-2 bg-primary-600 text-white rounded-lg font-bold text-sm hover:bg-primary-700 transition flex justify-center items-center gap-2"
           >
@@ -103,12 +126,12 @@ export default function GeoFencingMap() {
                 </button>
               </div>
             ))}
-            
+
             {blockedZones.length === 0 && (
               <div className="text-center py-10 text-slate-400 text-sm">No negative areas defined.</div>
             )}
           </div>
-          
+
           {/* Visual Placeholder for a Real Map */}
           <div className="mt-6 h-32 bg-primary-50 rounded-xl border-2 border-dashed border-primary-100 flex items-center justify-center text-primary-300 font-bold text-xs uppercase tracking-widest">
             Interactive Map Visualization Component

@@ -1,4 +1,9 @@
-import { BanknotesIcon, UsersIcon } from '@heroicons/react/24/outline';
+import { 
+  UserGroupIcon, 
+  UserCircleIcon, 
+  ClipboardDocumentListIcon, 
+  CurrencyDollarIcon 
+} from '@heroicons/react/24/outline';
 import KPICard from '../components/KPICard.jsx';
 import MonthlyDisbursementChart from '../components/MonthlyDisbursementChart.jsx';
 import LoanStatusPieChart from '../components/LoanStatusPieChart.jsx';
@@ -56,10 +61,10 @@ export default function Dashboard() {
 
       {/* KPI CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KPICard icon={UsersIcon} title="Total Borrowers" value={kpis?.totalTenants ?? "-"} />
-        <KPICard icon={UsersIcon} title="Active Users" value={kpis?.activeUsers ?? "-"} />
-        <KPICard icon={BanknotesIcon} title="Total Loans" value={kpis?.totalLoans ?? "-"} />
-        <KPICard icon={BanknotesIcon} title="Disbursed Amount" value={kpis?.disbursedAmount ?? "-"} />
+        <KPICard icon={UserGroupIcon} title="Total Borrowers" value={kpis?.totalTenants ?? "-"} />
+        <KPICard icon={UserCircleIcon} title="Active Users" value={kpis?.activeUsers ?? "-"} />
+        <KPICard icon={ClipboardDocumentListIcon} title="Total Loans" value={kpis?.totalLoans ?? "-"} />
+        <KPICard icon={CurrencyDollarIcon} title="Disbursed Amount" value={kpis?.disbursedAmount ?? "-"} />
       </div>
 
       {/* CHARTS */}

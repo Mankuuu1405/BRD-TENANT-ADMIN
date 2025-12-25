@@ -31,3 +31,17 @@ export const branchAPI = {
     return res.data;
   },
 };
+
+export const businessAPI = {
+  getAll: async () => {
+    const res = await axiosInstance.get("tenants/businesses/"); // Adjust endpoint if different
+    return res.data;
+  },
+};
+
+export const productAPI = {
+  getAll: async () => {
+    const res = await axiosInstance.get("tenants/products/"); // Adjust endpoint if different
+    return res.data;
+  },
+};

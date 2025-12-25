@@ -1,40 +1,59 @@
-import { useState } from "react";
-import { 
-  BuildingLibraryIcon, CheckBadgeIcon, ArrowPathIcon, 
-  QrCodeIcon, CurrencyRupeeIcon 
+import { useState, useEffect } from "react";
+import { mandateAPI } from "../services/mandateService";
+import {
+  BuildingLibraryIcon, CheckBadgeIcon, ArrowPathIcon,
+  QrCodeIcon, CurrencyRupeeIcon
 } from "@heroicons/react/24/outline";
 
-const MOCK_MANDATES = [
-  { id: "LN-2024-001", customer: "Amit Sharma", bank: "HDFC Bank", account: "XXXX-1234", ifsc: "HDFC0001234", amount: 50000, penny_drop: "Verified", enach: "Pending" },
-  { id: "LN-2024-002", customer: "Priya Singh", bank: "SBI", account: "XXXX-5678", ifsc: "SBIN0004567", amount: 120000, penny_drop: "Pending", enach: "Pending" },
-  { id: "LN-2024-003", customer: "Rahul Verma", bank: "ICICI Bank", account: "XXXX-9012", ifsc: "ICIC0003456", amount: 75000, penny_drop: "Verified", enach: "Active" },
-];
-
 export default function MandateManagement() {
-  const [mandates, setMandates] = useState(MOCK_MANDATES);
+  const [mandates, setMandates] = useState([]);
   const [processing, setProcessing] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const handlePennyDrop = (id) => {
+  useEffect(() => {
+    const fetchMandates = async () => {
+      try {
+        setLoading(true);
+        const data = await mandateAPI.getAll();
+        setMandates(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load mandates:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMandates();
+  }, []);
+
+  const handlePennyDrop = async (id) => {
     setProcessing(id);
-    setTimeout(() => {
+    try {
+      await mandateAPI.verifyPennyDrop(id);
       setMandates(mandates.map(m => m.id === id ? { ...m, penny_drop: "Verified" } : m));
+      alert("Penny Drop Successful!");
+    } catch (err) {
+      alert("Penny Drop Failed. Please check bank details.");
+    } finally {
       setProcessing(null);
-      alert("Penny Drop Successful! Account Name Matched.");
-    }, 2000);
+    }
   };
 
-  const handleEnach = (id) => {
+  const handleEnach = async (id) => {
     setProcessing(id);
-    setTimeout(() => {
+    try {
+      await mandateAPI.registerEnach(id);
       setMandates(mandates.map(m => m.id === id ? { ...m, enach: "Active" } : m));
-      setProcessing(null);
       alert("eNACH Link Sent to Customer!");
-    }, 2000);
+    } catch (err) {
+      alert("eNACH Registration Failed.");
+    } finally {
+      setProcessing(null);
+    }
   };
 
   return (
     <div className="p-8 max-w-[1600px] mx-auto min-h-screen bg-slate-50">
-      
+
       <div className="flex items-center gap-4 mb-10">
         <div className="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
           <BuildingLibraryIcon className="h-8 w-8" />
@@ -60,7 +79,7 @@ export default function MandateManagement() {
           <tbody className="divide-y divide-slate-100 text-sm">
             {mandates.map((item) => (
               <tr key={item.id} className="group hover:bg-slate-50 transition">
-                <td className="px-8 py-6 font-bold text-primary-600">{item.id}</td>
+                <td className="px-8 py-6 font-bold text-indigo-600">{item.id}</td>
                 <td className="px-8 py-6 font-bold text-slate-700">{item.customer}</td>
                 <td className="px-8 py-6">
                   <div className="font-bold text-slate-800">{item.bank}</div>
@@ -87,20 +106,20 @@ export default function MandateManagement() {
                 <td className="px-8 py-6 text-right">
                   <div className="flex justify-end gap-2">
                     {item.penny_drop !== 'Verified' && (
-                      <button 
+                      <button
                         onClick={() => handlePennyDrop(item.id)}
                         disabled={processing === item.id}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:border-primary-500 hover:text-primary-600 rounded-lg font-bold text-xs transition shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:border-indigo-500 hover:text-indigo-600 rounded-lg font-bold text-xs transition shadow-sm"
                       >
                         {processing === item.id ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : <CurrencyRupeeIcon className="h-4 w-4" />}
                         Penny Drop
                       </button>
                     )}
                     {item.penny_drop === 'Verified' && item.enach !== 'Active' && (
-                      <button 
+                      <button
                         onClick={() => handleEnach(item.id)}
                         disabled={processing === item.id}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-bold text-xs hover:bg-primary-700 transition shadow-lg shadow-primary-200"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold text-xs hover:bg-indigo-700 transition shadow-lg shadow-indigo-200"
                       >
                         {processing === item.id ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : <QrCodeIcon className="h-4 w-4" />}
                         Register eNACH

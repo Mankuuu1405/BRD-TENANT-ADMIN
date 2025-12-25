@@ -169,7 +169,7 @@ export default function AddBusiness() {
 
       <div className="max-w-4xl bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
         <div className="bg-slate-50/50 border-b border-slate-100 px-10 py-8 flex items-center gap-4">
-           <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-sm">
+           <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm">
               <BuildingOffice2Icon className="w-6 h-6" />
            </div>
            <div>
@@ -181,7 +181,7 @@ export default function AddBusiness() {
         <div className="p-10 space-y-10">
            <div className="space-y-6">
               <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
-                 <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md">1</span>
+                 <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-md">1</span>
                  <h4 className="text-sm font-bold text-slate-700 uppercase tracking-widest">Identity & Registration</h4>
               </div>
               
@@ -230,7 +230,7 @@ export default function AddBusiness() {
 
            <div className="space-y-6">
               <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
-                 <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md">2</span>
+                 <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-md">2</span>
                  <h4 className="text-sm font-bold text-slate-700 uppercase tracking-widest">Location & Products</h4>
               </div>
 
@@ -268,7 +268,7 @@ export default function AddBusiness() {
            <button 
               onClick={handleSubmit} 
               disabled={loading}
-              className="px-10 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all transform active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs flex items-center gap-2"
+              className="px-10 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs flex items-center gap-2"
            >
               {loading ? "Registering..." : "Register Business"}
            </button>

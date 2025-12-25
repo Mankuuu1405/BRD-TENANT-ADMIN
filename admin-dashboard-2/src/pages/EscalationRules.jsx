@@ -1,27 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ClockIcon, BellAlertIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { escalationAPI } from "../services/escalationService.js";
 
 export default function EscalationRules() {
-  const [rules, setRules] = useState([
-    { id: 1, stage: "Underwriting", condition: "Delay > 24 Hours", action: "Notify Supervisor", priority: "High" },
-    { id: 2, stage: "Disbursement", condition: "Approval Pending > 4 Hours", action: "Auto-Reassign to Manager", priority: "Critical" },
-  ]);
+  const [rules, setRules] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRule, setNewRule] = useState({ stage: "Underwriting", hours: "", action: "Notify", priority: "Medium" });
+  const [loading, setLoading] = useState(true);
 
-  const addRule = () => {
+  const addRule = async () => {
     if (!newRule.hours) return;
-    const rule = {
-      id: Date.now(),
+    
+    // Prepare the payload for the backend
+    const payload = {
       stage: newRule.stage,
       condition: `Delay > ${newRule.hours} Hours`,
       action: newRule.action,
       priority: newRule.priority
     };
-    setRules([...rules, rule]);
-    setIsModalOpen(false);
+
+    try {
+      const createdRule = await escalationAPI.create(payload);
+      setRules([...rules, createdRule]); // Add the real record from server
+      setIsModalOpen(false);
+      setNewRule({ stage: "Underwriting", hours: "", action: "Notify Supervisor", priority: "Medium" }); // Reset
+    } catch (err) {
+      alert("Failed to save rule. Please try again.");
+    }
   };
+
+  const handleDelete = async (id) => {
+    try {
+      await escalationAPI.delete(id);
+      setRules(rules.filter(r => r.id !== id));
+    } catch (err) {
+      alert("Delete failed on server.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchRules = async () => {
+      try {
+        const data = await escalationAPI.getAll();
+        setRules(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load escalation rules:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRules();
+  }, []);
 
   return (
     <div className="p-8 max-w-6xl mx-auto min-h-screen bg-slate-50">
@@ -36,14 +66,14 @@ export default function EscalationRules() {
             <h1 className="text-3xl font-black text-slate-900 tracking-tight">Escalation Master</h1>
             <p className="text-slate-500 font-medium">Define auto-triggers for delayed applications.</p>
           </div>
-        </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-slate-800 transition"
-        >
-          <PlusIcon className="w-5 h-5" /> Add Rule
-        </button>
       </div>
+      <button 
+        onClick={() => setIsModalOpen(true)}
+        className="flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-primary-700 shadow-lg shadow-primary-200 transition"
+      >
+        <PlusIcon className="w-5 h-5" /> Add Rule
+      </button>
+    </div>
 
       {/* Rules Grid */}
       <div className="grid grid-cols-1 gap-4">
@@ -68,7 +98,7 @@ export default function EscalationRules() {
               }`}>
                 {rule.priority} Priority
               </span>
-              <button onClick={() => setRules(rules.filter(r => r.id !== rule.id))} className="p-2 text-slate-300 hover:text-rose-500 transition">
+              <button onClick={() => handleDelete(rule.id)} className="p-2 text-slate-300 hover:text-rose-500 transition">
                 <TrashIcon className="h-5 w-5" />
               </button>
             </div>
@@ -105,7 +135,7 @@ export default function EscalationRules() {
             </div>
             <div className="flex justify-end gap-3 mt-8">
               <button onClick={() => setIsModalOpen(false)} className="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100">Cancel</button>
-              <button onClick={addRule} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold">Save Rule</button>
+              <button onClick={addRule} className="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold shadow-lg shadow-primary-200">Save Rule</button>
             </div>
           </div>
         </div>

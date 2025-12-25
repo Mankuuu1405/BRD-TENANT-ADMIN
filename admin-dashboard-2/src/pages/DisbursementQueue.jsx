@@ -1,21 +1,43 @@
-import { useState } from "react";
-import { BanknotesIcon, CheckCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import { useState, useEffect } from "react";
+import { BanknotesIcon, CheckCircleIcon, ArrowRightIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { disbursementAPI } from "../services/disbursementService";
 
 export default function DisbursementQueue() {
   // Mock Data: Only loans with status 'DOCS_SIGNED' appear here
-  const [queue, setQueue] = useState([
-    { id: 'PL-2025-001', name: 'Rahul Verma', amount: 500000, bank: 'HDFC Bank', ifsc: 'HDFC0001234', status: 'READY_FOR_DISBURSAL' },
-    { id: 'PL-2025-045', name: 'Sneha Gupta', amount: 150000, bank: 'ICICI Bank', ifsc: 'ICIC0008899', status: 'READY_FOR_DISBURSAL' },
-  ]);
+  const [queue, setQueue] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
 
-  const handleDisburse = (loan) => {
-    if(!confirm(`Confirm transfer of ₹${loan.amount.toLocaleString()} to ${loan.name}?`)) return;
+  useEffect(() => {
+    const fetchQueue = async () => {
+      try {
+        setLoading(true);
+        const data = await disbursementAPI.getQueue();
+        setQueue(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load queue:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQueue();
+  }, []);
 
-    // Call API
-    alert(`💰 ₹${loan.amount.toLocaleString()} transferred successfully to ${loan.bank}!`);
-    
-    // Remove from queue locally
-    setQueue(queue.filter(q => q.id !== loan.id));
+  const handleDisburse = async (loan) => {
+    if (!confirm(`Confirm transfer of ₹${loan.amount.toLocaleString()} to ${loan.name}?`)) return;
+
+    setProcessingId(loan.id); // Show spinner for this specific row
+    try {
+      await disbursementAPI.disburse(loan.id);
+      
+      // Success: Remove from UI queue
+      setQueue(prev => prev.filter(q => q.id !== loan.id));
+      alert(`💰 Funds transferred successfully to ${loan.bank}!`);
+    } catch (err) {
+      alert("Disbursement failed. Please check balance or connectivity.");
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   return (
@@ -59,10 +81,14 @@ export default function DisbursementQueue() {
                 </td>
                 <td className="px-6 py-4 text-right">
                   <button 
-                    onClick={() => handleDisburse(loan)}
+                    onClick={() => handleDisburse(loan)} disabled={processingId === loan.id}
                     className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition shadow-sm"
                   >
-                    Disburse Funds <ArrowRightIcon className="h-4 w-4" />
+                    {processingId === loan.id ? (
+                      <>Processing... <ArrowPathIcon className="h-4 w-4 animate-spin" /></>
+                    ) : (
+                      <>Disburse Funds <ArrowRightIcon className="h-4 w-4" /></>
+                    )}
                   </button>
                 </td>
               </tr>

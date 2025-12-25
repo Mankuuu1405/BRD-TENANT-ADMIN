@@ -166,7 +166,7 @@ const Button = ({ children, variant = "primary", onClick, disabled, className, i
   const baseClasses = "inline-flex items-center justify-center gap-2 rounded-xl font-bold uppercase tracking-widest transition-all duration-200 transform active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const sizes = { sm: "px-4 py-2 text-[10px]", md: "px-6 py-2.5 text-xs uppercase tracking-widest", lg: "px-8 py-3.5 text-sm uppercase tracking-widest" };
   const variants = {
-    primary: "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 border border-transparent",
+    primary: "bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-200 border border-transparent",
     secondary: "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 hover:text-slate-900 shadow-sm",
     danger: "bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 shadow-sm",
     ghost: "bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-transparent",
@@ -877,20 +877,20 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in my-10 border border-slate-100 relative">
-      <div className="bg-slate-900 p-12 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-slate-800 rounded-full -mr-20 -mt-20 opacity-50 blur-3xl"></div>
-        <div className="relative z-10"><h2 className="text-4xl font-black mb-3 tracking-tight">Create New Product</h2><p className="text-slate-400 font-medium text-lg">Define the core parameters for your lending product.</p></div>
+      <div className="bg-primary-600 p-12 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-700 rounded-full -mr-20 -mt-20 opacity-40 blur-3xl"></div>
+        <div className="relative z-10"><h2 className="text-4xl font-black mb-3 tracking-tight">Create New Product</h2><p className="text-white/80 font-medium text-lg">Define the core parameters for your lending product.</p></div>
       </div>
       <div className="p-12 space-y-16">
         <div className="space-y-8">
-           <div className="flex items-center gap-5 border-b border-slate-100 pb-6"><span className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xl shadow-xl shadow-slate-900/20">1</span><div><h4 className="text-lg font-bold text-slate-900 uppercase tracking-widest">Core Details</h4><p className="text-sm text-slate-500 font-medium mt-1">Basic identification information</p></div></div>
+           <div className="flex items-center gap-5 border-b border-slate-100 pb-6"><span className="w-12 h-12 rounded-2xl bg-primary-600 text-white flex items-center justify-center font-bold text-xl shadow-xl shadow-primary-200">1</span><div><h4 className="text-lg font-bold text-slate-900 uppercase tracking-widest">Core Details</h4><p className="text-sm text-slate-500 font-medium mt-1">Basic identification information</p></div></div>
            <div className="grid grid-cols-1 gap-10 pl-4">
                <FormGroup label="Product Name" required><InputBox placeholder="e.g. Salaried Personal Loan 2025" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="text-lg" /></FormGroup>
                <FormGroup label="Loan Type"><SelectBox options={LOAN_TYPES.map(t => ({label: t, value: t}))} value={form.loan_type} onChange={e => setForm({...form, loan_type: e.target.value})} /></FormGroup>
            </div>
         </div>
         <div className="space-y-8">
-            <div className="flex items-center gap-5 border-b border-slate-100 pb-6"><span className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xl shadow-xl shadow-slate-900/20">2</span><div><h4 className="text-lg font-bold text-slate-900 uppercase tracking-widest">Constraints</h4><p className="text-sm text-slate-500 font-medium mt-1">Financial boundaries and limits</p></div></div>
+            <div className="flex items-center gap-5 border-b border-slate-100 pb-6"><span className="w-12 h-12 rounded-2xl bg-primary-600 text-white flex items-center justify-center font-bold text-xl shadow-xl shadow-primary-200">2</span><div><h4 className="text-lg font-bold text-slate-900 uppercase tracking-widest">Constraints</h4><p className="text-sm text-slate-500 font-medium mt-1">Financial boundaries and limits</p></div></div>
             <div className="grid grid-cols-2 gap-10 pl-4">
                 <FormGroup label="Min Amount" required><InputBox type="number" prefix="₹" value={form.min_amount} onChange={e => setForm({...form, min_amount: e.target.value})} /></FormGroup>
                 <FormGroup label="Max Amount" required><InputBox type="number" prefix="₹" value={form.max_amount} onChange={e => setForm({...form, max_amount: e.target.value})} /></FormGroup>

@@ -37,7 +37,7 @@ const InputBox = ({ type = "text", placeholder, value, onChange, icon, className
   <div className={`relative flex items-center group ${className}`}>
     {icon && (
       <div className="absolute left-0 pl-4 flex items-center pointer-events-none z-10">
-        <span className="text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-200">{icon}</span>
+        <span className="text-slate-400 group-focus-within:text-blue-500 transition-colors duration-200">{icon}</span>
       </div>
     )}
     <input
@@ -46,7 +46,7 @@ const InputBox = ({ type = "text", placeholder, value, onChange, icon, className
       onChange={onChange}
       placeholder={placeholder}
       disabled={disabled}
-      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none placeholder:text-slate-300 disabled:bg-slate-100 disabled:text-slate-400 ${icon ? 'pl-11' : ''}`}
+      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none placeholder:text-slate-300 disabled:bg-slate-100 disabled:text-slate-400 ${icon ? 'pl-11' : ''}`}
       {...props}
     />
   </div>
@@ -56,7 +56,7 @@ const TextareaBox = ({ placeholder, value, onChange, icon, rows = 3, ...props })
   <div className="relative flex group">
     {icon && (
       <div className="absolute left-0 top-3.5 pl-4 flex items-start pointer-events-none z-10">
-        <span className="text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-200">{icon}</span>
+        <span className="text-slate-400 group-focus-within:text-blue-500 transition-colors duration-200">{icon}</span>
       </div>
     )}
     <textarea
@@ -64,7 +64,7 @@ const TextareaBox = ({ placeholder, value, onChange, icon, rows = 3, ...props })
       onChange={onChange}
       placeholder={placeholder}
       rows={rows}
-      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none placeholder:text-slate-300 resize-none ${icon ? 'pl-11' : ''}`}
+      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none placeholder:text-slate-300 resize-none ${icon ? 'pl-11' : ''}`}
       {...props}
     />
   </div>
@@ -74,13 +74,13 @@ const SelectBox = ({ options, value, onChange, placeholder, icon, ...props }) =>
   <div className="relative flex items-center group">
     {icon && (
       <div className="absolute left-0 pl-4 flex items-center pointer-events-none z-10">
-        <span className="text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-200">{icon}</span>
+        <span className="text-slate-400 group-focus-within:text-blue-500 transition-colors duration-200">{icon}</span>
       </div>
     )}
     <select
       value={value}
       onChange={onChange}
-      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none appearance-none cursor-pointer ${icon ? 'pl-11' : ''}`}
+      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none appearance-none cursor-pointer ${icon ? 'pl-11' : ''}`}
       {...props}
     >
       {placeholder && <option value="" disabled>{placeholder}</option>}
@@ -90,7 +90,7 @@ const SelectBox = ({ options, value, onChange, placeholder, icon, ...props }) =>
         </option>
       ))}
     </select>
-    <div className="absolute right-4 pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors duration-200"><Icons.ChevronDown /></div>
+    <div className="absolute right-4 pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors duration-200"><Icons.ChevronDown /></div>
   </div>
 );
 
@@ -100,7 +100,7 @@ const ToggleSwitch = ({ checked, onChange, label }) => (
     <button
       type="button"
       onClick={onChange}
-      className={`${checked ? 'bg-indigo-600' : 'bg-slate-300'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
+      className={`${checked ? 'bg-blue-600' : 'bg-slate-300'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
     >
       <span aria-hidden="true" className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}/>
     </button>
@@ -116,7 +116,7 @@ const FormGroup = ({ label, children, required, className }) => (
 
 const Button = ({ children, variant = "primary", onClick, disabled, className, icon }) => {
   const variants = {
-    primary: "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20",
+    primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 border border-transparent",
     secondary: "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 hover:text-slate-900 shadow-sm",
     danger: "bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 shadow-sm",
     ghost: "bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100",
@@ -154,16 +154,16 @@ const MultiSelectDropdown = ({ options, selected, onChange, placeholder }) => {
   return (
     <div className="relative group" ref={wrapperRef}>
       <div 
-        className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 focus-within:bg-white min-h-[48px] p-2 flex flex-wrap gap-2 items-center cursor-pointer transition-all duration-200"
+        className="w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:bg-white min-h-[48px] p-2 flex flex-wrap gap-2 items-center cursor-pointer transition-all duration-200"
         onClick={() => setIsOpen(!isOpen)}
       >
         {selected.length === 0 ? (
           <span className="text-slate-400 pl-2 select-none">{placeholder}</span>
         ) : (
           selected.map((item) => (
-            <span key={item} className="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-indigo-200 flex items-center gap-1">
+            <span key={item} className="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-200 flex items-center gap-1">
               {item}
-              <span className="cursor-pointer hover:text-indigo-900" onClick={(e) => {e.stopPropagation(); toggleOption(item);}}>×</span>
+              <span className="cursor-pointer hover:text-blue-900" onClick={(e) => {e.stopPropagation(); toggleOption(item);}}>×</span>
             </span>
           ))
         )}
@@ -178,7 +178,7 @@ const MultiSelectDropdown = ({ options, selected, onChange, placeholder }) => {
               className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-slate-50 last:border-0"
               onClick={() => toggleOption(option.name)}
             >
-              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selected.includes(option.name) ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 bg-white'}`}>
+              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selected.includes(option.name) ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white'}`}>
                 {selected.includes(option.name) && <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
               </div>
               <span className="text-sm font-bold text-slate-700">{option.name}</span>
@@ -329,7 +329,7 @@ export default function Branches() {
            <div className="relative flex-1 max-w-lg">
              <span className="absolute left-5 top-4 text-slate-400"><Icons.Search /></span>
              <input 
-               className="w-full pl-14 pr-6 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400" 
+               className="w-full pl-14 pr-6 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400" 
                placeholder="Search by Branch Name..." 
                value={search} onChange={e => setSearch(e.target.value)}
              />
@@ -349,10 +349,10 @@ export default function Branches() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredItems.map((b) => (
-                <tr key={b.id} className="hover:bg-indigo-50/30 transition-colors group">
+                <tr key={b.id} className="hover:bg-blue-50/30 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="font-bold text-slate-800 text-base">{b.branch_name}</div>
-                    <div className="text-xs font-bold text-indigo-600 mt-1">{b.business_name}</div>
+                    <div className="text-xs font-bold text-blue-600 mt-1">{b.business_name}</div>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex flex-col gap-1">
@@ -384,7 +384,7 @@ export default function Branches() {
                           setEditing({ ...b, loan_product: formattedProducts }); 
                           setValidationError(""); 
                         }} 
-                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"><Icons.Edit />
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><Icons.Edit />
                       </button>
                       <button onClick={() => setDeleting(b)} className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition"><Icons.Trash /></button>
                     </div>
@@ -403,7 +403,7 @@ export default function Branches() {
           <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="bg-slate-50 px-8 py-6 border-b border-slate-200 flex justify-between items-center">
                <div className="flex items-center gap-4">
-                 <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"><Icons.Building /></div>
+                 <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center"><Icons.Building /></div>
                  <div>
                    <h2 className="text-xl font-extrabold text-slate-900">Add New Branch</h2>
                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Tenant ID: {form.tenant_id}</p>
@@ -415,7 +415,7 @@ export default function Branches() {
             <div className="p-8 overflow-y-auto space-y-8">
                {/* 1. Branch Identity */}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="col-span-2"><h4 className="text-xs font-bold text-indigo-900 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">Identity & Business</h4></div>
+                  <div className="col-span-2"><h4 className="text-xs font-bold text-blue-900 uppercase tracking-widest border-b border-blue-100 pb-2 mb-2">Identity & Business</h4></div>
                   <FormGroup label="Branch Name" required>
                     <InputBox value={form.branch_name} onChange={e => setForm({...form, branch_name: e.target.value})} placeholder="e.g. Mumbai Main" icon={<Icons.Building />} />
                   </FormGroup>
@@ -432,7 +432,7 @@ export default function Branches() {
 
                {/* 2. Contact */}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="col-span-2"><h4 className="text-xs font-bold text-indigo-900 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">Contact & Address</h4></div>
+                  <div className="col-span-2"><h4 className="text-xs font-bold text-blue-900 uppercase tracking-widest border-b border-blue-100 pb-2 mb-2">Contact & Address</h4></div>
                   <FormGroup label="Contact Person">
                     <InputBox value={form.contact_person} onChange={e => setForm({...form, contact_person: e.target.value})} placeholder="Manager Name" icon={<Icons.User />} />
                   </FormGroup>
@@ -449,7 +449,7 @@ export default function Branches() {
 
                {/* 3. Status & Security */}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="col-span-2"><h4 className="text-xs font-bold text-indigo-900 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">Status & Security</h4></div>
+                  <div className="col-span-2"><h4 className="text-xs font-bold text-blue-900 uppercase tracking-widest border-b border-blue-100 pb-2 mb-2">Status & Security</h4></div>
                   
                   {/* UPDATED PASSWORD FIELD - EDITABLE BY DEFAULT */}
                   <FormGroup label="Branch Password" required>
@@ -464,7 +464,7 @@ export default function Branches() {
                         <button 
                             type="button"
                             onClick={() => setForm({...form, password: generatePassword()})} 
-                            className="absolute right-2 top-2 p-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition"
+                            className="absolute right-2 top-2 p-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
                             title="Auto-Generate"
                         >
                             Generate

@@ -1,15 +1,19 @@
 import axiosInstance from "../utils/axiosInstance";
 
-export const collectionService = {
-  // Get dashboard stats (Total Overdue, NPA count, etc.)
-  getStats: () => axiosInstance.get("/lms/collections/stats/"),
+export const collectionAPI = {
 
-  // Get list of overdue loans
-  getOverdueQueue: (params) => axiosInstance.get("/lms/collections/queue/", { params }),
+  getOverdueLoans: async () => {
+    const res = await axiosInstance.get("collections/overdue-loans/");
+    return res.data;
+  },
 
-  // Log a collection call
-  logCall: (loanId, remarks) => axiosInstance.post(`/lms/collections/${loanId}/log-call/`, { remarks }),
+  getCollectionStats: async () => {
+    const res = await axiosInstance.get("collections/stats/");
+    return res.data;
+  },
 
-  // Send a legal/warning notice
-  sendNotice: (loanId, type) => axiosInstance.post(`/lms/collections/${loanId}/send-notice/`, { type }),
+  triggerNotice: async (loanId) => {
+    const res = await axiosInstance.post(`collections/send-notice/${loanId}/`);
+    return res.data;
+  }
 };

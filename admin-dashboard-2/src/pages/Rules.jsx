@@ -198,7 +198,7 @@ export default function Rules() {
         <Card title="Workflow Rules" onClick={() => setOpen("workflow")} />
         <Card title="Validation Rules" onClick={() => setOpen("validation")} />
         <Card title="Assignment Rules" onClick={() => setOpen("assignment")} />
-        <Card title="Security Rules" onClick={() => setOpen("security")} full />
+        <Card title="Security Rules" onClick={() => setOpen("security")} />
       </div>
 
       {/* ------------------ MODALS ------------------ */}

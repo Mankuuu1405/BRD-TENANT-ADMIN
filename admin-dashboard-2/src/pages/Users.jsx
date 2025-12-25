@@ -90,7 +90,7 @@ const FormGroup = ({ label, children, required, className }) => (
 
 const Button = ({ children, variant = "primary", onClick, disabled, className, icon }) => {
   const variants = {
-    primary: "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20 active:bg-slate-950",
+    primary: "bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-200 active:bg-primary-800",
     secondary: "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 hover:text-slate-900 shadow-sm active:bg-slate-100",
     danger: "bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 shadow-sm active:bg-rose-100",
     ghost: "bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:bg-slate-200",
@@ -436,7 +436,7 @@ export default function Users() {
           <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="bg-slate-50 px-8 py-6 border-b border-slate-200 flex justify-between items-center">
                <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center"><Icons.User /></div>
+                 <div className="w-12 h-12 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center"><Icons.User /></div>
                  <div><h2 className="text-xl font-extrabold text-slate-900">Add New User</h2><p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Tenant: {currentTenant}</p></div>
                </div>
                <button onClick={() => setCreating(false)} className="text-slate-400 hover:text-rose-500 transition"><Icons.Close /></button>

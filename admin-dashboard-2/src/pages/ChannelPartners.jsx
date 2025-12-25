@@ -38,7 +38,7 @@ const InputBox = ({ type = "text", placeholder, value, onChange, icon, className
   <div className={`relative flex items-center group ${className}`}>
     {icon && (
       <div className="absolute left-0 pl-4 flex items-center pointer-events-none z-10">
-        <span className="text-slate-400 group-focus-within:text-primary-500 transition-colors duration-200">{icon}</span>
+        <span className="text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-200">{icon}</span>
       </div>
     )}
     <input
@@ -47,7 +47,7 @@ const InputBox = ({ type = "text", placeholder, value, onChange, icon, className
       onChange={onChange}
       placeholder={placeholder}
       disabled={disabled}
-      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none placeholder:text-slate-300 disabled:bg-slate-100 disabled:text-slate-400 ${icon ? 'pl-11' : ''}`}
+      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none placeholder:text-slate-300 disabled:bg-slate-100 disabled:text-slate-400 ${icon ? 'pl-11' : ''}`}
       {...props}
     />
   </div>
@@ -57,13 +57,13 @@ const SelectBox = ({ options, value, onChange, placeholder, icon, ...props }) =>
   <div className="relative flex items-center group">
     {icon && (
       <div className="absolute left-0 pl-4 flex items-center pointer-events-none z-10">
-        <span className="text-slate-400 group-focus-within:text-primary-500 transition-colors duration-200">{icon}</span>
+        <span className="text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-200">{icon}</span>
       </div>
     )}
     <select
       value={value}
       onChange={onChange}
-      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none appearance-none cursor-pointer ${icon ? 'pl-11' : ''}`}
+      className={`w-full bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-transparent block p-3.5 shadow-sm transition-all duration-200 ease-in-out outline-none appearance-none cursor-pointer ${icon ? 'pl-11' : ''}`}
       {...props}
     >
       {placeholder && <option value="" disabled>{placeholder}</option>}
@@ -73,7 +73,7 @@ const SelectBox = ({ options, value, onChange, placeholder, icon, ...props }) =>
         </option>
       ))}
     </select>
-    <div className="absolute right-4 pointer-events-none text-slate-400 group-focus-within:text-primary-600 transition-colors duration-200"><Icons.ChevronDown /></div>
+    <div className="absolute right-4 pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors duration-200"><Icons.ChevronDown /></div>
   </div>
 );
 
@@ -83,7 +83,7 @@ const ToggleSwitch = ({ checked, onChange, label }) => (
     <button
       type="button"
       onClick={onChange}
-      className={`${checked ? 'bg-primary-600' : 'bg-slate-300'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
+      className={`${checked ? 'bg-indigo-600' : 'bg-slate-300'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
     >
       <span aria-hidden="true" className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}/>
     </button>
@@ -254,7 +254,7 @@ export default function ChannelPartners() {
            <div className="relative flex-1 max-w-lg">
              <span className="absolute left-5 top-4 text-slate-400"><Icons.Search /></span>
              <input 
-               className="w-full pl-14 pr-6 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all placeholder:text-slate-400" 
+               className="w-full pl-14 pr-6 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400" 
                placeholder="Search partners..." 
                value={search} onChange={e => setSearch(e.target.value)}
              />

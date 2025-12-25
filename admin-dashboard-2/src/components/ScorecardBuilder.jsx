@@ -1,20 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalculatorIcon, PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { riskAPI } from "../services/riskService";
 
 export default function ScorecardBuilder() {
   const [activeTab, setActiveTab] = useState("SALARIED");
-  const [rules, setRules] = useState([
-    { id: 1, parameter: "CIBIL Score", condition: "GREATER_THAN", value: "750", score: 50, weight: "Critical" },
-    { id: 2, parameter: "Age", condition: "BETWEEN", value: "25-40", score: 20, weight: "Medium" },
-  ]);
+  const [rules, setRules] = useState([]);
+  const [loading, setLoading] = useState(false)
 
   const [newRule, setNewRule] = useState({ parameter: "Salary", condition: "GREATER_THAN", value: "", score: "" });
 
-  const addRule = () => {
-    if (!newRule.value || !newRule.score) return;
-    setRules([...rules, { ...newRule, id: Date.now(), weight: "Low" }]);
-    setNewRule({ parameter: "Salary", condition: "GREATER_THAN", value: "", score: "" });
+  useEffect(() => {
+    loadRules();
+  }, [activeTab]);
+
+  const loadRules = async () => {
+    setLoading(true);
+    try {
+      const res = await riskAPI.getScorecardRules(activeTab);
+      setRules(res.data);
+    } catch (err) {
+      console.error("Failed to load rules");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const addRule = async () => {
+    if (!newRule.value || !newRule.score) return;
+    try {
+        // 3. Save to Database
+        await riskAPI.createScorecardRule({ ...newRule, category: activeTab });
+        loadRules(); // Refresh list
+        setNewRule({ parameter: "Salary", condition: "GREATER_THAN", value: "", score: "" });
+    } catch (e) { alert("Save failed"); }
+  };
+
+  const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this rule?")) return;
+  try {
+    await riskAPI.deleteScorecardRule(id); 
+    loadRules(); 
+  } catch (e) {
+    alert("Delete failed. Please try again.");
+  }
+};
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 h-full flex flex-col">
@@ -66,7 +95,7 @@ export default function ScorecardBuilder() {
                   <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded">+{rule.score}</span>
                 </td>
                 <td className="py-4 text-right">
-                  <button onClick={() => setRules(rules.filter(r => r.id !== rule.id))} className="text-slate-300 hover:text-rose-500">
+                  <button onClick={() => handleDelete(rule.id)} className="text-slate-300 hover:text-rose-500">
                     <TrashIcon className="h-4 w-4" />
                   </button>
                 </td>
